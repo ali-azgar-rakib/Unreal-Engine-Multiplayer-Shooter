@@ -1,0 +1,71 @@
+# ============================
+# Unreal Engine build folders
+# ============================
+Binaries/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+
+# ============================
+# Compiled binary files
+# ============================
+*.exe
+*.dll
+*.lib
+*.app
+*.dylib
+*.so
+*.a
+*.pch
+*.obj
+*.sdf
+*.opensdf
+*.VC.db
+*.ipch
+*.db
+*.log
+
+# ============================
+# IDE and editor config files
+# ============================
+.vs/
+.vscode/
+.idea/
+*.sln
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.vspscc
+
+# ============================
+# Generated project files (optional)
+# ============================
+*.xcodeproj
+*.xcworkspace
+
+# ============================
+# Temporary & backup files
+# ============================
+*.tmp
+*.bak
+*.backup
+*.cache
+
+# ============================
+# System files (macOS / Windows)
+# ============================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ============================
+# Git internal data
+# ============================
+.git/
+
+# ============================
+# Optional: Steam SDK (if using)
+# ============================
+Plugins/OnlineSubsystemSteam/Source/ThirdParty/Steamworks/
