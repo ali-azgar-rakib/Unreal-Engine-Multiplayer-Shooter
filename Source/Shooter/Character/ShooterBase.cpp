@@ -9,7 +9,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
-
+#include "Net/UnrealNetwork.h"
+#include "Shooter/Weapon/Weapon.h"
+#include "Shooter/Components/CombatComponent.h"
 
 AShooterBase::AShooterBase()
 {
@@ -28,7 +30,14 @@ AShooterBase::AShooterBase()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
+
+	CombatComponent = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	CombatComponent->SetIsReplicated(true);
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
+
+
 
 // Called when the game starts or when spawned
 void AShooterBase::BeginPlay()
@@ -36,6 +45,49 @@ void AShooterBase::BeginPlay()
 	Super::BeginPlay();
 	
 }
+void AShooterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(AShooterBase, OverlappingWeapon, COND_OwnerOnly);
+}
+
+void AShooterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (CombatComponent) {
+		CombatComponent->Character = this;
+	}
+}
+
+
+void AShooterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(EQuipAction, ETriggerEvent::Started, this, &ThisClass::EquipWeapon);
+		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &ThisClass::CrouchEvent);
+		// Moving
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AShooterBase::Move);
+		// Looking
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AShooterBase::Look);
+	}
+
+
+}
+
+
+void AShooterBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
 
 void AShooterBase::Move(const FInputActionValue& Value)
 {
@@ -67,31 +119,69 @@ void AShooterBase::Look(const FInputActionValue& Value)
 
 }
 
-// Called every frame
-void AShooterBase::Tick(float DeltaTime)
+void AShooterBase::EquipWeapon()
 {
-	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
-void AShooterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AShooterBase::Move);
-		// Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AShooterBase::Look);
+	if (CombatComponent && HasAuthority()) {
+		CombatComponent->EquipWeapon(OverlappingWeapon);
+	}
+	else {
+		ServerEquipWeapon();
 	}
 
-
 }
+
+void AShooterBase::CrouchEvent()
+{
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();
+	}
+}
+
+void AShooterBase::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
+{
+
+	if (OverlappingWeapon) {
+		OverlappingWeapon->ShowWidget(true);
+	}
+	if (LastWeapon) {
+		LastWeapon->ShowWidget(false);
+	}
+}
+
+void AShooterBase::ServerEquipWeapon_Implementation()
+{
+	EquipWeapon();
+}
+
+void AShooterBase::SetOverlappingWeapon(AWeapon* Weapon)
+{
+
+	if (OverlappingWeapon) {
+		OverlappingWeapon->ShowWidget(false);
+	}
+	OverlappingWeapon = Weapon;
+
+	if (OverlappingWeapon) {
+
+		if (IsLocallyControlled()) {
+			OverlappingWeapon->ShowWidget(true);
+		}
+	}
+}
+
+bool AShooterBase::IsWeaponEquipped() const
+{
+
+	return (CombatComponent && CombatComponent->Weapon);
+}
+
+
+
 
 void AShooterBase::NotifyControllerChanged()
 {
@@ -105,4 +195,6 @@ void AShooterBase::NotifyControllerChanged()
 	
 	}
 }
+
+
 
