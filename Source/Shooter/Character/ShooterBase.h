@@ -33,6 +33,10 @@ protected:
 
 	void CrouchEvent();
 
+	void SetAiming();
+
+	void ReleaseAiming();
+
 private:
 	UPROPERTY(VisibleAnywhere,Category="Camera")
 	class USpringArmComponent* CameraBoom;
@@ -62,6 +66,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* CrouchAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AimAction;
+
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWeapon* OverlappingWeapon{};
 
@@ -77,4 +84,5 @@ public:
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	bool IsWeaponEquipped() const;
+	bool IsAiming() const;
 };

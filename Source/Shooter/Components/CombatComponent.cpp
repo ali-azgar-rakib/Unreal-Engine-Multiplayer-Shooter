@@ -7,6 +7,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -24,6 +25,28 @@ void UCombatComponent::BeginPlay()
 	
 }
 
+void UCombatComponent::Onrep_Weapon()
+{
+	if (Weapon) {
+		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+		Character->bUseControllerRotationYaw = true;
+	}
+}
+
+void UCombatComponent::ServerSetAiming_Implementation(bool bAiming)
+{
+	bIsAiming = bAiming;
+}
+
+void UCombatComponent::SetAiming(bool bAiming)
+{
+	bIsAiming = bAiming;
+	if (!Character->HasAuthority())
+	{
+		ServerSetAiming(bAiming);
+	}
+}
+
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -33,6 +56,7 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	DOREPLIFETIME(UCombatComponent, Weapon);
+	DOREPLIFETIME(UCombatComponent, bIsAiming);
 }
 
 void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
@@ -46,6 +70,9 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 		RightHandSocket->AttachActor(Weapon, Character->GetMesh());
 	}
 	Weapon->SetOwner(Character);
+
+	Character->GetCharacterMovement()->bOrientRotationToMovement = false;
+	Character->bUseControllerRotationYaw = true;
 
 }
 

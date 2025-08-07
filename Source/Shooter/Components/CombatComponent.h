@@ -28,11 +28,20 @@ protected:
 private:
 	class AShooterBase* Character{ nullptr };
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = Onrep_Weapon)
 	class AWeapon* Weapon{ nullptr };
 
+	UFUNCTION()
+	void Onrep_Weapon();
+
+	UPROPERTY(Replicated)
+	bool bIsAiming{ false };
+
+	UFUNCTION(Server,Reliable)
+	void ServerSetAiming(bool bAiming);
+
 public:	
-	
+	void SetAiming(bool bAiming);
 
 
 		

@@ -72,6 +72,10 @@ void AShooterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 		EnhancedInputComponent->BindAction(EQuipAction, ETriggerEvent::Started, this, &ThisClass::EquipWeapon);
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &ThisClass::CrouchEvent);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ThisClass::SetAiming);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ThisClass::ReleaseAiming);
+
+
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AShooterBase::Move);
 		// Looking
@@ -142,6 +146,20 @@ void AShooterBase::CrouchEvent()
 	}
 }
 
+void AShooterBase::SetAiming()
+{
+	if (CombatComponent) {
+		CombatComponent->SetAiming(true);
+	}
+}
+
+void AShooterBase::ReleaseAiming()
+{
+	if (CombatComponent) {
+		CombatComponent->SetAiming(false);
+	}
+}
+
 void AShooterBase::OnRep_OverlappingWeapon(AWeapon* LastWeapon)
 {
 
@@ -178,6 +196,11 @@ bool AShooterBase::IsWeaponEquipped() const
 {
 
 	return (CombatComponent && CombatComponent->Weapon);
+}
+
+bool AShooterBase::IsAiming() const
+{
+	return CombatComponent && CombatComponent->bIsAiming;
 }
 
 
