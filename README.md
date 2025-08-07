@@ -1,10 +1,7 @@
 # Unreal Engine Multiplayer Project
 
-## 📌 Project Status
 
-🚧 **Work in Progress** — This project is currently under active development.
-
----
+![Work in Progress](https://img.shields.io/badge/Status-Work%20in%20Progress-orange)
 
 ## ✨ Features
 
