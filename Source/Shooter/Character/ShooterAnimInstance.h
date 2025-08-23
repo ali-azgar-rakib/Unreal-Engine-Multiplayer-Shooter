@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Shooter/Enums/TurningInPlace.h"
 #include "ShooterAnimInstance.generated.h"
 
 /**
@@ -24,6 +25,9 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess="true"))
 	class AShooterBase* ShooterCharacter;
+
+	UPROPERTY(BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess="true"))
+	class AWeapon* Weapon;
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	float Speed;
@@ -51,4 +55,17 @@ private:
 
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	float AO_Yaw;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	float AO_Pitch;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	FTransform LeftHandTransform;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	ETurningInPlace TurningInPlace;
+
 };

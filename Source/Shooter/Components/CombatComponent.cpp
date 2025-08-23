@@ -36,6 +36,9 @@ void UCombatComponent::Onrep_Weapon()
 void UCombatComponent::ServerSetAiming_Implementation(bool bAiming)
 {
 	bIsAiming = bAiming;
+	if (Character) {
+		Character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
+	}
 }
 
 void UCombatComponent::SetAiming(bool bAiming)
@@ -44,6 +47,9 @@ void UCombatComponent::SetAiming(bool bAiming)
 	if (!Character->HasAuthority())
 	{
 		ServerSetAiming(bAiming);
+	}
+	if (Character) {
+		Character->GetCharacterMovement()->MaxWalkSpeed = bIsAiming ? AimWalkSpeed : BaseWalkSpeed;
 	}
 }
 

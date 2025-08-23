@@ -40,6 +40,12 @@ private:
 	UFUNCTION(Server,Reliable)
 	void ServerSetAiming(bool bAiming);
 
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float AimWalkSpeed{ 300.0f };
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float BaseWalkSpeed{ 600.0f };
+
 public:	
 	void SetAiming(bool bAiming);
 

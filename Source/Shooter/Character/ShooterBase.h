@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Shooter/Enums/TurningInPlace.h"
 #include "ShooterBase.generated.h"
+
 
 UCLASS()
 class SHOOTER_API AShooterBase : public ACharacter
@@ -80,9 +82,24 @@ private:
 
 	UFUNCTION(Server,Reliable)
 	void ServerEquipWeapon();
+
+	void AimOffset(float DeltaTime);
+
+	float AO_Yaw{ 0.f };
+	float InterpAO_Yaw{ 0.f };
+	float AO_Pitch{ 0.f };
+	FRotator StartingAimRotation{ 0.f, 0.f, 0.f };
+
+	ETurningInPlace TurningInPlace;
+	void TurningInPlaceHandler(float DeltaTime);
 public:	
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
 	bool IsWeaponEquipped() const;
 	bool IsAiming() const;
+
+	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
+	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
+	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
+	AWeapon* GetWeapon();
 };
