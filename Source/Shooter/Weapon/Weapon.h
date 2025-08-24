@@ -50,9 +50,14 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	class UWidgetComponent* WeaponWidget;
 
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	class UAnimationAsset* FireAnimAsset;
+
 public:	
 
 	void SeTWeaponState(EWeaponState NewState);
+
+	void Fire();
 
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	

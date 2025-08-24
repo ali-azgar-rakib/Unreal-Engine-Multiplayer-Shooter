@@ -8,6 +8,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Animation/AnimationAsset.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -53,6 +54,8 @@ void UCombatComponent::SetAiming(bool bAiming)
 	}
 }
 
+
+
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -81,4 +84,31 @@ void UCombatComponent::EquipWeapon(AWeapon* WeaponToEquip)
 	Character->bUseControllerRotationYaw = true;
 
 }
+
+void UCombatComponent::FireWeapon(bool bFiredButton)
+{
+	if (Weapon == nullptr || Character == nullptr) return;
+	bFireButtonPressed = bFiredButton;
+	if (bFireButtonPressed) {
+		ServerFire();
+	}
+
+}
+
+void UCombatComponent::ServerFire_Implementation()
+{
+	MulticastFire();
+}
+
+
+void UCombatComponent::MulticastFire_Implementation()
+{
+	if (Character && Weapon)
+	{
+		Character->PlayFireAnimMontage();
+		Weapon->Fire();
+
+	}
+}
+
 

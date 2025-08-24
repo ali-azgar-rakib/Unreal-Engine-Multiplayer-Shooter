@@ -21,6 +21,8 @@ public:
 
 	void EquipWeapon(class AWeapon* WeaponToEquip);
 
+	void FireWeapon(bool bFiredButton);
+
 protected:
 	
 	virtual void BeginPlay() override;
@@ -46,9 +48,15 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float BaseWalkSpeed{ 600.0f };
 
+	bool bFireButtonPressed{ false };
+
 public:	
 	void SetAiming(bool bAiming);
 
+	UFUNCTION(Server,Reliable)
+	void ServerFire();
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastFire();
 
-		
 };

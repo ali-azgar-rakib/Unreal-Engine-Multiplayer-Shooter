@@ -39,6 +39,11 @@ protected:
 
 	void ReleaseAiming();
 
+	void FireButtonPressed();
+
+	void FireButtonReleased();
+
+	virtual void Jump()override;
 private:
 	UPROPERTY(VisibleAnywhere,Category="Camera")
 	class USpringArmComponent* CameraBoom;
@@ -71,6 +76,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* AimAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* FireAction;
+
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	class AWeapon* OverlappingWeapon{};
 
@@ -92,6 +100,10 @@ private:
 
 	ETurningInPlace TurningInPlace;
 	void TurningInPlaceHandler(float DeltaTime);
+
+	UPROPERTY(EditAnywhere,category=Rifle)
+	class UAnimMontage* RifleFireAnimMontage;
+
 public:	
 
 	void SetOverlappingWeapon(AWeapon* Weapon);
@@ -102,4 +114,6 @@ public:
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 	AWeapon* GetWeapon();
+
+	void PlayFireAnimMontage();
 };

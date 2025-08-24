@@ -91,6 +91,14 @@ void AWeapon::SeTWeaponState(EWeaponState NewState)
 	}
 }
 
+void AWeapon::Fire()
+{
+
+	if (FireAnimAsset) {
+		WeaponMesh->PlayAnimation(FireAnimAsset, false);
+	}
+}
+
 void AWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

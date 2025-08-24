@@ -81,6 +81,10 @@ void AShooterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ThisClass::SetAiming);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ThisClass::ReleaseAiming);
 
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::FireButtonPressed);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ThisClass::FireButtonReleased);
+
+
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AShooterBase::Move);
@@ -165,6 +169,30 @@ void AShooterBase::ReleaseAiming()
 {
 	if (CombatComponent) {
 		CombatComponent->SetAiming(false);
+	}
+}
+
+void AShooterBase::FireButtonPressed()
+{
+	if (CombatComponent == nullptr || CombatComponent->Weapon == nullptr) return;
+	CombatComponent->FireWeapon(true);
+}
+
+void AShooterBase::FireButtonReleased()
+{
+	if (CombatComponent == nullptr || CombatComponent->Weapon == nullptr) return;
+	CombatComponent->FireWeapon(false);
+}
+
+void AShooterBase::Jump()
+{
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Super::Jump();
 	}
 }
 
@@ -275,6 +303,19 @@ AWeapon* AShooterBase::GetWeapon()
 {
 	if(CombatComponent == nullptr) return nullptr;
 	return CombatComponent->Weapon;
+}
+
+void AShooterBase::PlayFireAnimMontage()
+{
+	if (CombatComponent == nullptr || CombatComponent->Weapon == nullptr) return;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance && RifleFireAnimMontage)
+	{
+		AnimInstance->Montage_Play(RifleFireAnimMontage);
+		FName SectionName = CombatComponent->bIsAiming ? FName("RifleAim") : FName("RifleHip");
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
 }
 
 
