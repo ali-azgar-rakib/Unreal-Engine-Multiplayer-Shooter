@@ -53,11 +53,14 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Weapon")
 	class UAnimationAsset* FireAnimAsset;
 
+	UPROPERTY(EditAnywhere, Category = "Weapon")
+	TSubclassOf<class ABulletShell> BulletShellClass;
+
 public:	
 
 	void SeTWeaponState(EWeaponState NewState);
 
-	void Fire();
+	virtual void Fire(const FVector &HitTarget);
 
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	

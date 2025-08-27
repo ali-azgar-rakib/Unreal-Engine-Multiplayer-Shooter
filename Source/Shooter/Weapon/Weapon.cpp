@@ -5,7 +5,8 @@
 #include "Components/WidgetComponent.h"
 #include "Shooter/Character/ShooterBase.h"
 #include "Net/UnrealNetwork.h"
-
+#include "Engine/SkeletalMeshSocket.h"
+#include "BulletShell.h"
 
 
 AWeapon::AWeapon()
@@ -47,6 +48,12 @@ void AWeapon::BeginPlay()
 	}
 
 	
+}
+
+void AWeapon::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
 }
 
 void AWeapon::OnRep_WeaponState()
@@ -91,19 +98,26 @@ void AWeapon::SeTWeaponState(EWeaponState NewState)
 	}
 }
 
-void AWeapon::Fire()
+void AWeapon::Fire(const FVector &HitTarget)
 {
 
 	if (FireAnimAsset) {
 		WeaponMesh->PlayAnimation(FireAnimAsset, false);
 	}
+
+	const USkeletalMeshSocket* AmmoSocket = WeaponMesh->GetSocketByName(FName("AmmoEject"));
+	if (AmmoSocket) {
+		FTransform SocketTransform = AmmoSocket->GetSocketTransform(WeaponMesh);
+
+		if (BulletShellClass) {
+			GetWorld()->SpawnActor<AActor>(BulletShellClass, SocketTransform.GetLocation(),SocketTransform.GetRotation().Rotator());
+			if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Spawn BulletShell"));
+		}
+
+	}
 }
 
-void AWeapon::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
-}
 
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {

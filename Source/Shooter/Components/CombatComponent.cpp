@@ -1,6 +1,3 @@
-
-
-
 #include "CombatComponent.h"
 #include "Shooter/Character/ShooterBase.h"
 #include "Shooter/Weapon/Weapon.h"
@@ -9,11 +6,14 @@
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Animation/AnimationAsset.h"
+#include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
+
 
 UCombatComponent::UCombatComponent()
 {
 
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 }
 
@@ -24,6 +24,45 @@ void UCombatComponent::BeginPlay()
 
 
 	
+}
+
+
+void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+
+
+}
+
+void UCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult)
+{
+	FVector2D ViewportSize;
+	if (GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+
+	FVector2D CrosshairLocation(ViewportSize.X * 0.5f, ViewportSize.Y * 0.5f);
+
+	FVector CrosshairWorldLocation, CrosshairWorldDirection;
+
+	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this, 0),
+		CrosshairLocation,
+		CrosshairWorldLocation,
+		CrosshairWorldDirection
+	);
+
+	if (bScreenToWorld) {
+
+		FVector Start = CrosshairWorldLocation;
+		FVector End = Start + (CrosshairWorldDirection * 10000.0f);
+
+		GetWorld()->LineTraceSingleByChannel(OutHitResult, Start, End, ECC_Visibility);
+
+	}
+
 }
 
 void UCombatComponent::Onrep_Weapon()
@@ -56,11 +95,7 @@ void UCombatComponent::SetAiming(bool bAiming)
 
 
 
-void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-}
 
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -90,23 +125,25 @@ void UCombatComponent::FireWeapon(bool bFiredButton)
 	if (Weapon == nullptr || Character == nullptr) return;
 	bFireButtonPressed = bFiredButton;
 	if (bFireButtonPressed) {
-		ServerFire();
+		FHitResult HitResult;
+		TraceUnderCrosshair(HitResult);
+		ServerFire(HitResult.ImpactPoint);
 	}
 
 }
 
-void UCombatComponent::ServerFire_Implementation()
+void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& HitPoint)
 {
-	MulticastFire();
+	MulticastFire(HitPoint);
 }
 
 
-void UCombatComponent::MulticastFire_Implementation()
+void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& HitPoint)
 {
 	if (Character && Weapon)
 	{
 		Character->PlayFireAnimMontage();
-		Weapon->Fire();
+		Weapon->Fire(HitPoint);
 
 	}
 }

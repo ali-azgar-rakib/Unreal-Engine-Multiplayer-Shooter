@@ -27,6 +27,8 @@ protected:
 	
 	virtual void BeginPlay() override;
 
+	void TraceUnderCrosshair(FHitResult& OutHitResult);
+
 private:
 	class AShooterBase* Character{ nullptr };
 
@@ -50,13 +52,14 @@ private:
 
 	bool bFireButtonPressed{ false };
 
+
 public:	
 	void SetAiming(bool bAiming);
 
 	UFUNCTION(Server,Reliable)
-	void ServerFire();
+	void ServerFire(const FVector_NetQuantize& HitPoint);
 	
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastFire();
+	void MulticastFire(const FVector_NetQuantize& HitPoint);
 
 };
