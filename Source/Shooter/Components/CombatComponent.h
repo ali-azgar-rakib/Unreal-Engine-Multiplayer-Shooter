@@ -55,6 +55,9 @@ private:
 
 	bool bFireButtonPressed{ false };
 
+	float CrosshairSpreadVelocityFactor{ 0.f };
+	float CrosshairSpreadJumpingFactor{ 0.f };
+
 
 public:	
 	void SetAiming(bool bAiming);
