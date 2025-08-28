@@ -63,6 +63,21 @@ public:
 	virtual void Fire(const FVector &HitTarget);
 
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
+
+
+	UPROPERTY(EditAnywhere, Category = "Crosshair")
+	class UTexture2D* CrosshairCenter;
+
+	UPROPERTY(EditAnywhere, Category = "Crosshair")
+	UTexture2D* CrosshairLeft;
 	
+	UPROPERTY(EditAnywhere, Category = "Crosshair")
+	UTexture2D* CrosshairRight;
+	
+	UPROPERTY(EditAnywhere, Category = "Crosshair")
+	UTexture2D* CrosshairTop;
+
+	UPROPERTY(EditAnywhere, Category = "Crosshair")
+	UTexture2D* CrosshairBottom;
 
 };

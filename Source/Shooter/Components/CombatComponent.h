@@ -29,8 +29,11 @@ protected:
 
 	void TraceUnderCrosshair(FHitResult& OutHitResult);
 
+	void SetCrosshair(float DeltaTime);
+
 private:
 	class AShooterBase* Character{ nullptr };
+	class AShooterPlayerController* Controller{ nullptr };
 
 	UPROPERTY(ReplicatedUsing = Onrep_Weapon)
 	class AWeapon* Weapon{ nullptr };

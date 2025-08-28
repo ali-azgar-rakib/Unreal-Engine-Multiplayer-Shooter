@@ -8,6 +8,8 @@
 #include "Animation/AnimationAsset.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
+#include "Shooter/PlayerController/ShooterPlayerController.h"
+#include "Shooter/HUD/ShooterHUD.h"
 
 
 UCombatComponent::UCombatComponent()
@@ -31,7 +33,7 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-
+	SetCrosshair(DeltaTime);
 
 }
 
@@ -63,6 +65,36 @@ void UCombatComponent::TraceUnderCrosshair(FHitResult& OutHitResult)
 
 	}
 
+}
+
+void UCombatComponent::SetCrosshair(float DeltaTime)
+{
+	if (Character == nullptr || Character->Controller == nullptr) return;
+	Controller = Controller == nullptr ? Cast<AShooterPlayerController>(Character->Controller) : Controller;
+
+	if (Controller)
+	{
+		AShooterHUD* ShooterHUD = Cast<AShooterHUD>(Controller->GetHUD());
+		if (ShooterHUD)
+		{
+			FHUDPackage HUDPackage;
+			if (Weapon == nullptr) {
+				HUDPackage.CrosshairCenter = nullptr;
+				HUDPackage.CrosshairLeft = nullptr;
+				HUDPackage.CrosshairRight = nullptr;
+				HUDPackage.CrosshairTop = nullptr;
+				HUDPackage.CrosshairBottom = nullptr;
+			}
+			else {
+				HUDPackage.CrosshairCenter = Weapon->CrosshairCenter;
+				HUDPackage.CrosshairLeft = Weapon->CrosshairLeft;
+				HUDPackage.CrosshairRight = Weapon->CrosshairRight;
+				HUDPackage.CrosshairTop = Weapon->CrosshairTop;
+				HUDPackage.CrosshairBottom = Weapon->CrosshairBottom;
+			}
+			ShooterHUD->SetHUDPackage(HUDPackage);
+		}
+	}
 }
 
 void UCombatComponent::Onrep_Weapon()
